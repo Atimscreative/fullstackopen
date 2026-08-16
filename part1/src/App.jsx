@@ -1,48 +1,61 @@
-const Hello = (props) => {
-  console.log(props, "PROPS");
+const Header = (props) => {
+  return <h1>{props.course}</h1>;
+};
+
+const Part = (props) => {
   return (
-    <div>
-      Hello {props.name}, you are {props.age} years old
-    </div>
+    <p>
+      {props.part} {props.exercises}
+    </p>
   );
 };
 
-const Footer = () => {
+const Content = (props) => {
   return (
-    <div>
-      greeting app created by <a href="https://github.com/mluukkai">mluukkai</a>
-    </div>
+    <>
+      <Part part={props.part1} exercises={props.exercises1} />
+      <Part part={props.part2} exercises={props.exercises2} />
+      <Part part={props.part3} exercises={props.exercises3} />
+    </>
   );
 };
 
-function App() {
-  const name = "Peter";
-  const age = 10;
+const Total = (props) => {
+  return (
+    <p>
+      Number of exercises{" "}
+      {props.exercises1 + props.exercises2 + props.exercises3}
+    </p>
+  );
+};
 
-  const friends = [
-    { name: "Peter", age: 4 },
-    { name: "Maya", age: 10 },
-  ];
-
-  const friends2 = ["Peter", "Maya"];
+const App = () => {
+  const course = "Half Stack application development";
+  const part1 = "Fundamentals of React";
+  const exercises1 = 10;
+  const part2 = "Using props to pass data";
+  const exercises2 = 7;
+  const part3 = "State of a component";
+  const exercises3 = 14;
 
   return (
     <div>
-      <h1>Greetings</h1>
-      <Hello name="Maya" age={26 + 10} />
-      <Hello name={name} age={age} />
-      <Footer />
-
-      <p>
-        {friends[0].name} {friends[0].age}
-      </p>
-      <p>
-        {friends[1].name} {friends[1].age}
-      </p>
-
-      <p>{friends2}</p>
+      <Header course={course} />
+      <Content
+        part1={part1}
+        exercises1={exercises1}
+        part2={part2}
+        exercises2={exercises2}
+        part3={part3}
+        exercises3={exercises3}
+      />
+      <Total
+        exercises1={exercises1}
+        exercises2={exercises2}
+        exercises3={exercises3}
+      />
     </div>
   );
-}
+};
 
 export default App;
