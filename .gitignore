@@ -1,1 +1,3 @@
 bash.exe.stackdump
+*.stackdump
+*/node_modules/
