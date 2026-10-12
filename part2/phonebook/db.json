@@ -1,4 +1,46 @@
 {
+  "notes": [
+    {
+      "id": "1",
+      "content": "HTML is easy",
+      "important": true
+    },
+    {
+      "id": "2",
+      "content": "Browser can execute only JavaScript",
+      "important": false
+    },
+    {
+      "id": "3",
+      "content": "GET and POST are the most important methods of HTTP protocol",
+      "important": true
+    },
+    {
+      "content": "newNote",
+      "important": true,
+      "id": "a4mYSHrUt9I"
+    },
+    {
+      "content": "newNote",
+      "important": true,
+      "id": "92ew5O5xnv8"
+    },
+    {
+      "content": "newNote",
+      "important": true,
+      "id": "-56nY48piKE"
+    },
+    {
+      "content": "newNote",
+      "important": false,
+      "id": "WBpQb6HiW7Y"
+    },
+    {
+      "content": "newNote",
+      "important": true,
+      "id": "TDvKrdt8KVo"
+    }
+  ],
   "persons": [
     {
       "name": "Arto Hellas",
@@ -20,5 +62,6 @@
       "number": "39-23-6423122",
       "id": "4"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
