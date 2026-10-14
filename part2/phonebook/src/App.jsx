@@ -4,6 +4,7 @@ import { PersonForm } from "./PersonForm";
 import { Filter } from "./Filter";
 import axios from "axios";
 import phoneService from "./services/phonebook";
+import Notification from "./Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -11,6 +12,8 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     phoneService.getAll().then((data) => setPersons(data));
@@ -59,14 +62,25 @@ const App = () => {
 
       const updatedPerson = { ...personToUpdate, number: newNumber };
 
-      phoneService.update(personToUpdate.id, updatedPerson).then((data) => {
-        console.log(data, "Updated person data");
-        setPersons(
-          persons.map((person) =>
-            person.id === personToUpdate.id ? data : person,
-          ),
-        );
-      });
+      phoneService
+        .update(personToUpdate.id, updatedPerson)
+        .then((data) => {
+          console.log(data, "Updated person data");
+          setPersons(
+            persons.map((person) =>
+              person.id === personToUpdate.id ? data : person,
+            ),
+          );
+        })
+        .catch((error) => {
+          setErrorMessage(
+            `Information of ${personToUpdate.name} has already been removed from server`,
+          );
+          setPersons(persons.filter((n) => n.id !== personToUpdate.id));
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+        });
 
       setNewName("");
       setNewNumber("");
@@ -76,6 +90,10 @@ const App = () => {
     const newPerson = { name: newName, number: newNumber };
     phoneService.create(newPerson).then((data) => {
       setPersons(persons.concat(data));
+      setSuccessMessage(`Added ${newName}`);
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 5000);
     });
     setNewName("");
     setNewNumber("");
@@ -99,6 +117,8 @@ const App = () => {
     <div>
       <div>
         <h2>Phonebook</h2>
+        <Notification message={successMessage} className="success" />
+        <Notification message={errorMessage} className="error" />
         <Filter search={search} handleSearch={handleSearch} />
       </div>
       <h2>Add new</h2>
