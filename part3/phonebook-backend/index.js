@@ -1,7 +1,14 @@
 const express = require("express");
 const app = express();
+const morgan = require("morgan");
 
 app.use(express.json());
+
+morgan.token("type", function (req, res) {
+  return req.body ? JSON.stringify(req.body) : "";
+});
+
+app.use(morgan(":method :url :status :type"));
 
 // let notes = [
 //   {
@@ -91,6 +98,8 @@ let persons = [
 
 //   response.status(204).end();
 // });
+
+
 
 // PERSONS API
 app.get("/api/persons", (request, response) => {
