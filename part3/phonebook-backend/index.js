@@ -43,19 +43,25 @@ let persons = [
 ];
 
 // PERSONS API
+
+// GET all persons
 app.get("/api/persons", (request, response) => {
   Person.find({}).then((persons) => {
     response.json(persons);
   });
 });
 
+// GET info about the phonebook
 app.get("/api/info", (request, response) => {
-  response.send(`
-    Phonebook has info for ${persons.length} people <br>
-    ${new Date()}
-    `);
+  Person.countDocuments({}).then((count) => {
+    response.send(`
+      Phonebook has info for ${count} people <br>
+      ${new Date()}
+      `);
+  });
 });
 
+// POST a new person
 app.post("/api/persons", (request, response) => {
   const body = request.body;
 
@@ -65,48 +71,87 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  // const existingPerson = persons.find(
-  //   (person) => person.name.toLowerCase() === body.name.toLowerCase(),
-  // );
-
-  // if (existingPerson) {
-  //   return response.status(400).json({
-  //     error: "Name must be unique",
-  //   });
-  // }
-
-  const newPerson = new Person({
-    name: body.name,
-    number: body.number,
-  });
-
-  newPerson.save().then((savedPerson) => {
-    response.status(201).json(savedPerson);
-  });
-});
-
-app.get("/api/persons/:id", (request, response) => {
-  const id = request.params.id;
-
-  Person.findById(id).then((person) => {
-    if (person) {
-      response.json(person);
+  Person.findOne({ name: body.name }).then((existingPerson) => {
+    if (existingPerson) {
+      return response.status(400).json({
+        error: "Name must be unique",
+      });
     } else {
-      response.status(404).json({ error: "Person not found" });
+      const newPerson = new Person({
+        name: body.name,
+        number: body.number,
+      });
+
+      newPerson.save().then((savedPerson) => {
+        response.status(201).json(savedPerson);
+      });
     }
   });
 });
 
-app.delete("/api/persons/:id", (request, response) => {
+// GET a person by ID
+app.get("/api/persons/:id", (request, response, next) => {
   const id = request.params.id;
-  persons = persons.filter((person) => person.id !== id);
 
-  if (persons.length > 0) {
-    response.status(204).end();
-  } else {
-    response.status(404).json({ error: "Person not found" });
-  }
+  Person.findById(id)
+    .then((person) => {
+      if (person) {
+        response.json(person);
+      } else {
+        response.status(404).end();
+      }
+    })
+    .catch((error) => next(error));
 });
+
+// PUT (update) a person by ID`
+app.put("/api/persons/:id", (request, response, next) => {
+  const id = request.params.id;
+  const body = request.body;
+
+  Person.findById(id)
+    .then((person) => {
+      if (!person) {
+        return response.status(404).end();
+      }
+
+      person.name = body.name;
+      person.number = body.number;
+
+      return person.save().then((updatedPerson) => {
+        response.json(updatedPerson);
+      });
+    })
+    .catch((error) => next(error));
+});
+
+// DELETE a person by ID
+app.delete("/api/persons/:id", (request, response) => {
+  Person.findByIdAndDelete(request.params.id)
+    .then((result) => {
+      response.status(204).end();
+    })
+    .catch((error) => next(error));
+});
+
+// OTHER MIDDLEWARE
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
+
+app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
