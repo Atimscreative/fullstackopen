@@ -88,13 +88,22 @@ const App = () => {
     }
 
     const newPerson = { name: newName, number: newNumber };
-    phoneService.create(newPerson).then((data) => {
-      setPersons(persons.concat(data));
-      setSuccessMessage(`Added ${newName}`);
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 5000);
-    });
+    phoneService
+      .create(newPerson)
+      .then((data) => {
+        setPersons(persons.concat(data));
+        setSuccessMessage(`Added ${newName}`);
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 5000);
+      })
+      .catch((error) => {
+        console.error(error.response.data.error, "AGGGA");
+        setErrorMessage(error.response.data.error);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      });
     setNewName("");
     setNewNumber("");
   };
